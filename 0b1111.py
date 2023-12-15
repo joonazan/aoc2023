@@ -11,15 +11,19 @@ def hash(s):
 with open(sys.argv[1]) as f:
     lenses = {}
     for i, x in enumerate(f.read().replace('\n', '').split(',')):
-        label = x[:2]
-        if x[2] == '=':
-            focal = int(x[3])
+        equals = x.find('=')
+        dash = x.find('-')
+        if equals != -1:
+            label = x[:equals]
+            focal = int(x[equals+1])
             if label in lenses:
                 lenses[label][1] = focal
             else:
                 lenses[label] = [i, focal]
-        if x[2] == '-' and label in lenses:
-            del lenses[label]
+        else:
+            label = x[:dash]
+            if label in lenses:
+                del lenses[label]
 
     boxes = [[] for _ in range(256)]
     for l in lenses:
@@ -28,7 +32,6 @@ with open(sys.argv[1]) as f:
     total = 0
     for ib, b in enumerate(boxes):
         b.sort()
-        print(b)
         for i, l in enumerate(b):
             total += (i + 1) * l[1] * (ib + 1)
     
